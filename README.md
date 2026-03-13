@@ -68,6 +68,64 @@ The ECS state machine models typical vehicle operating states:
 
 State transitions occur based on sensor inputs, operator commands, and diagnostics.
 
+```mermaid
+stateDiagram-v2
+    [*] --> OFF
+
+    OFF --> BOOT : Power On
+    BOOT --> IDLE : Init OK
+    BOOT --> FAULT : Init Failed
+
+    IDLE --> RUNNING : Start Command
+    IDLE --> OFF : Power Off
+
+    RUNNING --> WARNING : Non-critical Issue
+    RUNNING --> FAULT : Critical Fault
+    RUNNING --> EMERGENCY_STOP : E-Stop Pressed
+    RUNNING --> IDLE : Stop Command
+
+    WARNING --> RUNNING : Issue Cleared
+    WARNING --> FAULT : Fault Escalates
+    WARNING --> EMERGENCY_STOP : E-Stop Pressed
+    WARNING --> IDLE : Stop Command
+
+    FAULT --> IDLE : Fault Reset
+    FAULT --> OFF : Shutdown
+    FAULT --> EMERGENCY_STOP : E-Stop Pressed
+
+    EMERGENCY_STOP --> OFF : System Reset / Power Cycle
+```
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> OFF
+
+    OFF --> BOOT : ignition_on
+    BOOT --> IDLE : boot_success
+    BOOT --> FAULT : boot_failure
+
+    IDLE --> RUNNING : start_operation
+    IDLE --> OFF : shutdown
+
+    RUNNING --> WARNING : warning_detected
+    RUNNING --> FAULT : fault_detected
+    RUNNING --> EMERGENCY_STOP : estop_triggered
+    RUNNING --> IDLE : stop_operation
+
+    WARNING --> RUNNING : warning_cleared
+    WARNING --> FAULT : fault_escalation
+    WARNING --> EMERGENCY_STOP : estop_triggered
+    WARNING --> IDLE : stop_operation
+
+    FAULT --> IDLE : reset_fault
+    FAULT --> OFF : shutdown
+    FAULT --> EMERGENCY_STOP : estop_triggered
+
+    EMERGENCY_STOP --> OFF : power_cycle_reset
+```
+
 ### Sensor Simulation
 
 The system simulates common vehicle telemetry:
